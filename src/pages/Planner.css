@@ -1,0 +1,485 @@
+/* ---------- PAGE ---------- */
+.planner-page {
+  min-height: 100vh;
+  padding: 40px 20px 40px;
+  background: url(../../public/background.jpg) center/cover no-repeat fixed;
+  background-attachment: fixed;
+  font-family: "Inter", "Segoe UI", sans-serif;
+  color: #1f2937;
+  position: relative;
+  overflow-x: hidden;
+}
+
+.planner-page::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(15, 23, 42, 0.6);
+  z-index: -1;
+  pointer-events: none;
+}
+
+/* Glow animation */
+@keyframes glow-pulse {
+  0%, 100% {
+    text-shadow: 0 0 20px rgba(99, 102, 241, 0.8), 0 0 40px rgba(34, 211, 238, 0.6), 0 0 60px rgba(168, 85, 247, 0.4);
+  }
+  50% {
+    text-shadow: 0 0 30px rgba(99, 102, 241, 1), 0 0 60px rgba(34, 211, 238, 0.8), 0 0 90px rgba(168, 85, 247, 0.6);
+  }
+}
+
+/* ---------- TITLE ---------- */
+.planner-page h1 {
+  text-align: center;
+  font-size: 34px;
+  font-weight: 800;
+  margin-bottom: 30px;
+  color: #ffffff;
+  text-shadow: 0 0 30px rgba(99, 102, 241, 0.9), 0 0 50px rgba(34, 211, 238, 0.7), 0 0 70px rgba(168, 85, 247, 0.5), 0 2px 8px rgba(0, 0, 0, 0.9);
+  animation: glow-pulse 3s ease-in-out infinite;
+}
+
+/* ---------- FORM CARD ---------- */
+.planner-form {
+  max-width: 1100px;
+  margin: 0 auto 40px;
+  padding: 28px;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  border-radius: 18px;
+  box-shadow: 0 12px 35px rgba(15, 23, 42, 0.3), 0 0 30px rgba(99, 102, 241, 0.2);
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 18px;
+}
+
+/* Inputs */
+.planner-form input,
+.planner-form select {
+  height: 48px;
+  padding: 0 14px;
+  border-radius: 10px;
+  border: 1px solid #dbeafe;
+  font-size: 15px;
+  outline: none;
+  transition: all 0.2s ease;
+  background: #f9fbff;
+}
+
+.planner-form input:focus,
+.planner-form select:focus {
+  border-color: #6366f1;
+  box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.15), 0 0 15px rgba(99, 102, 241, 0.3);
+}
+
+/* Button */
+.planner-form button {
+  grid-column: 1 / -1;
+  height: 52px;
+  border-radius: 14px;
+  border: none;
+  background: linear-gradient(90deg, #6366f1, #22d3ee);
+  color: white;
+  font-size: 17px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  box-shadow: 0 0 15px rgba(99, 102, 241, 0.5);
+}
+
+.planner-form button:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 0 25px rgba(99, 102, 241, 0.8), 0 0 40px rgba(34, 211, 238, 0.5), 0 12px 25px rgba(99, 102, 241, 0.35);
+}
+
+.planner-form button:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+/* ---------- SUMMARY ---------- */
+.summary {
+  max-width: 1100px;
+  margin: 0 auto 45px;
+  padding: 22px 26px;
+  background: rgba(99, 102, 241, 0.15);
+  backdrop-filter: blur(10px);
+  border-left: 6px solid #6366f1;
+  border-radius: 14px;
+  font-size: 16px;
+  line-height: 1.6;
+  color: #f0f9ff;
+  text-shadow: 0 0 8px rgba(34, 211, 238, 0.3);
+  box-shadow: 0 0 20px rgba(99, 102, 241, 0.2);
+}
+
+/* ---------- SECTIONS ---------- */
+.section {
+  max-width: 1200px;
+  margin: 0 auto 30px;
+}
+
+.section h2 {
+  font-size: 26px;
+  font-weight: 700;
+  margin-bottom: 18px;
+  color: #ffffff;
+  text-shadow: 0 0 20px rgba(99, 102, 241, 0.7), 0 0 35px rgba(34, 211, 238, 0.5), 0 2px 6px rgba(0, 0, 0, 0.8);
+}
+
+/* ---------- TABLES ---------- */
+.schedule,
+.diet {
+  width: 100%;
+  border-collapse: collapse;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 10px 30px rgba(15, 23, 42, 0.2), 0 0 20px rgba(99, 102, 241, 0.1);
+}
+
+/* Table Head */
+.schedule thead,
+.diet thead {
+  background: #eef2ff;
+}
+
+.schedule th,
+.diet th {
+  padding: 14px 10px;
+  font-size: 14px;
+  text-align: center;
+  font-weight: 700;
+  color: #0f172a;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+/* Table Body */
+.schedule td,
+.diet td {
+  padding: 14px 10px;
+  font-size: 14px;
+  text-align: center;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+/* Zebra rows */
+.schedule tbody tr:nth-child(even),
+.diet tbody tr:nth-child(even) {
+  background: #f9fbff;
+}
+
+/* Hover */
+.schedule tbody tr:hover,
+.diet tbody tr:hover {
+  background: #eef2ff;
+  transition: background 0.15s ease;
+}
+
+/* Week column */
+.schedule td:first-child {
+  font-weight: 700;
+  color: #4338ca;
+}
+
+/* ---------- RESPONSIVE ---------- */
+@media (max-width: 900px) {
+  .planner-page h1 {
+    font-size: 28px;
+  }
+
+  .planner-form {
+    padding: 20px;
+  }
+
+  .section h2 {
+    font-size: 22px;
+  }
+
+  .schedule th,
+  .schedule td,
+  .diet th,
+  .diet td {
+    font-size: 13px;
+    padding: 10px 6px;
+  }
+}
+
+/* Mobile scroll */
+@media (max-width: 700px) {
+  .schedule,
+  .diet {
+    display: block;
+    overflow-x: auto;
+    white-space: nowrap;
+  }
+}
+/* LOGOUT BUTTON */
+.logout-btn {
+  position: fixed;
+  top: 20px;
+  right: 24px;
+  padding: 10px 18px;
+  border-radius: 10px;
+  border: none;
+  background: #ef4444;
+  color: white;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 0 15px rgba(239, 68, 68, 0.5), 0 8px 20px rgba(239, 68, 68, 0.3);
+  z-index: 1000;
+  transition: box-shadow 0.3s ease;
+}
+
+.logout-btn:hover {
+  background: #dc2626;
+  box-shadow: 0 0 25px rgba(239, 68, 68, 0.7), 0 12px 30px rgba(239, 68, 68, 0.4);
+}
+
+/* CONFIRM BUTTON */
+.confirm-wrapper {
+  display: flex;
+  justify-content: center;
+  margin: 50px 0 20px;
+}
+
+.confirm-btn {
+  padding: 16px 42px;
+  border-radius: 14px;
+  border: none;
+  background: linear-gradient(90deg, #22c55e, #16a34a);
+  color: white;
+  font-size: 17px;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 0 20px rgba(34, 197, 94, 0.5), 0 12px 30px rgba(34, 197, 94, 0.3);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.confirm-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 0 30px rgba(34, 197, 94, 0.7), 0 18px 40px rgba(34, 197, 94, 0.45);
+}
+/* ---------- DIET PLAN SECTION ---------- */
+.diet-section {
+  max-width: 1200px;
+  margin: 0 auto 30px;
+}
+
+.diet-section h2 {
+  font-size: 26px;
+  font-weight: 700;
+  margin-bottom: 20px;
+  color: #ffffff;
+  text-shadow: 0 0 20px rgba(99, 102, 241, 0.7), 0 0 35px rgba(34, 211, 238, 0.5), 0 2px 6px rgba(0, 0, 0, 0.8);
+}
+
+.diet-items {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 18px;
+}
+
+.meal-card {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  padding: 22px;
+  border-radius: 14px;
+  box-shadow: 0 8px 20px rgba(15, 23, 42, 0.2), 0 0 15px rgba(99, 102, 241, 0.15);
+  border-top: 4px solid #f59e0b;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.meal-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 30px rgba(15, 23, 42, 0.25), 0 0 25px rgba(99, 102, 241, 0.3);
+}
+
+.meal-card h3 {
+  font-size: 18px;
+  font-weight: 700;
+  color: #1f2937;
+  margin-bottom: 12px;
+}
+
+.meal-card p {
+  font-size: 14px;
+  line-height: 1.6;
+  color: #4b5563;
+  margin: 8px 0;
+}
+
+/* ---------- WORKOUT SCHEDULE SECTION ---------- */
+.workout-section {
+  max-width: 1200px;
+  margin: 0 auto 30px;
+}
+
+.workout-section h2 {
+  font-size: 26px;
+  font-weight: 700;
+  margin-bottom: 20px;
+  color: #ffffff;
+  text-shadow: 0 0 20px rgba(99, 102, 241, 0.7), 0 0 35px rgba(34, 211, 238, 0.5), 0 2px 6px rgba(0, 0, 0, 0.8);
+}
+
+.week-plan {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  padding: 28px;
+  border-radius: 14px;
+  box-shadow: 0 8px 20px rgba(15, 23, 42, 0.2), 0 0 15px rgba(99, 102, 241, 0.15);
+  margin-bottom: 15px;
+}
+
+.week-plan h3 {
+  font-size: 20px;
+  font-weight: 700;
+  color: #3b82f6;
+  margin-bottom: 16px;
+  text-shadow: 0 0 10px rgba(99, 102, 241, 0.3);
+}
+
+.days-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 14px;
+}
+
+.day-card {
+  background: rgba(249, 251, 255, 0.95);
+  backdrop-filter: blur(10px);
+  padding: 16px;
+  border-radius: 10px;
+  border: 1px solid rgba(219, 234, 254, 0.7);
+  transition: all 0.2s ease;
+}
+
+.day-card:hover {
+  background: rgba(239, 242, 255, 0.98);
+  border-color: #6366f1;
+  box-shadow: 0 0 15px rgba(99, 102, 241, 0.3);
+}
+
+.day-card h4 {
+  font-size: 16px;
+  font-weight: 700;
+  color: #0f172a;
+  margin-bottom: 10px;
+}
+
+.day-card p {
+  font-size: 13px;
+  line-height: 1.5;
+  color: #4b5563;
+}
+
+/* ---------- EXERCISES SECTION ---------- */
+.exercises-section {
+  max-width: 1200px;
+  margin: 0 auto 30px;
+}
+
+.exercises-section h2 {
+  font-size: 26px;
+  font-weight: 700;
+  margin-bottom: 20px;
+  color: #ffffff;
+  text-shadow: 0 0 20px rgba(99, 102, 241, 0.7), 0 0 35px rgba(34, 211, 238, 0.5), 0 2px 6px rgba(0, 0, 0, 0.8);
+}
+
+.exercise-items {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 18px;
+}
+
+.exercise-card {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  padding: 22px;
+  border-radius: 14px;
+  box-shadow: 0 8px 20px rgba(15, 23, 42, 0.2), 0 0 15px rgba(99, 102, 241, 0.15);
+  border-top: 4px solid #8b5cf6;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.exercise-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 30px rgba(15, 23, 42, 0.25), 0 0 25px rgba(99, 102, 241, 0.3);
+}
+
+.exercise-card h3 {
+  font-size: 18px;
+  font-weight: 700;
+  color: #1f2937;
+  margin-bottom: 12px;
+}
+
+.exercise-card p {
+  font-size: 14px;
+  line-height: 1.6;
+  color: #4b5563;
+  margin-bottom: 14px;
+}
+
+.youtube-link {
+  display: inline-block;
+  padding: 8px 14px;
+  background: linear-gradient(90deg, #ef4444, #f97316);
+  color: white;
+  text-decoration: none;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  box-shadow: 0 0 10px rgba(239, 68, 68, 0.4);
+}
+
+.youtube-link:hover {
+  transform: scale(1.05);
+  box-shadow: 0 0 20px rgba(239, 68, 68, 0.6), 0 8px 20px rgba(239, 68, 68, 0.3);
+}
+
+/* ---------- RESPONSIVE ---------- */
+@media (max-width: 900px) {
+  .diet-items,
+  .exercise-items {
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  }
+
+  .days-grid {
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  }
+
+  .week-plan {
+    padding: 18px;
+  }
+
+  .meal-card,
+  .exercise-card {
+    padding: 16px;
+  }
+}
+
+@media (max-width: 600px) {
+  .diet-items,
+  .exercise-items {
+    grid-template-columns: 1fr;
+  }
+
+  .days-grid {
+    grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+  }
+
+  .diet-section h2,
+  .workout-section h2,
+  .exercises-section h2 {
+    font-size: 22px;
+  }
+}
