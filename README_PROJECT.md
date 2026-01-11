@@ -85,7 +85,7 @@ docker-compose up -d
 Frontend will be available on http://localhost (port 80) and backend on http://localhost:8000.
 
 Notes:
-- The frontend build picks up `REACT_APP_API_URL` at build time; the provided `docker-compose.yml` sets it to `http://backend:8000` so client requests are proxied to the backend service.
+- The frontend build picks up `REACT_APP_API_URL` at build time. Since Nginx proxies requests to the backend, this should typically be left empty (to use relative paths) or set to the public URL, rather than the internal Docker service name.
 - Provide secrets via environment variables (or a `.env` file) before `docker-compose up`:
 
 ```bash

@@ -1,8 +1,13 @@
+import os
 import openai
 import json
 
-# PUT YOUR KEY DIRECTLY (as you requested)
-openai.api_key = "sk-ijklmnopqrstuvwxijklmnopqrstuvwxijklmnop"
+# Load API key from environment
+OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
+if not OPENAI_API_KEY:
+  raise RuntimeError("OPENAI_API_KEY environment variable not set")
+
+openai.api_key = OPENAI_API_KEY
 
 
 def generate_ai_plan(data: dict) -> dict:
