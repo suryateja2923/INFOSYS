@@ -4,23 +4,42 @@ import { FitnessInput } from '@/components/ui/FitnessInput';
 import { FitnessCard } from '@/components/ui/FitnessCard';
 import { useFitplanStore } from '@/store/fitplanStore';
 import { useNavigate } from 'react-router-dom';
-import { Mail, Lock, Dumbbell, Sparkles } from 'lucide-react';
+import { Mail, Lock, Dumbbell, Sparkles, User } from 'lucide-react';
+import { cn } from '@/lib/utils';
 
 const Login: React.FC = () => {
   const navigate = useNavigate();
   const { setAuthenticated, isOnboarded } = useFitplanStore();
   const [isLoading, setIsLoading] = useState(false);
+  const [isSignUp, setIsSignUp] = useState(false);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [name, setName] = useState('');
   const [error, setError] = useState('');
 
-  const handleLogin = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
     
     if (!email || !password) {
-      setError('Please fill in all fields');
+      setError('Please fill in all required fields');
       return;
+    }
+
+    if (isSignUp) {
+      if (!name) {
+        setError('Please enter your name');
+        return;
+      }
+      if (password !== confirmPassword) {
+        setError('Passwords do not match');
+        return;
+      }
+      if (password.length < 6) {
+        setError('Password must be at least 6 characters');
+        return;
+      }
     }
 
     setIsLoading(true);
@@ -37,6 +56,13 @@ const Login: React.FC = () => {
     } else {
       navigate('/onboarding');
     }
+  };
+
+  const toggleMode = () => {
+    setIsSignUp(!isSignUp);
+    setError('');
+    setPassword('');
+    setConfirmPassword('');
   };
 
   return (
@@ -65,7 +91,7 @@ const Login: React.FC = () => {
         <div className="absolute bottom-1/4 right-1/4 w-80 h-80 bg-secondary/10 rounded-full blur-3xl animate-float" style={{ animationDelay: '2s' }} />
       </div>
 
-      {/* Login Card */}
+      {/* Login/Signup Card */}
       <div className="relative z-10 w-full max-w-md animate-scale-in">
         <div className="text-center mb-8">
           <div className="inline-flex items-center gap-2 mb-4">
@@ -78,13 +104,52 @@ const Login: React.FC = () => {
             </h1>
           </div>
           <p className="text-muted-foreground">
-            AI-powered personalized fitness & nutrition
+            {isSignUp ? 'Start your fitness transformation' : 'AI-powered personalized fitness & nutrition'}
           </p>
         </div>
 
         <FitnessCard className="p-8">
-          <form onSubmit={handleLogin} className="space-y-6">
+          {/* Toggle Tabs */}
+          <div className="flex mb-6 p-1 bg-muted rounded-xl">
+            <button
+              onClick={() => toggleMode()}
+              className={cn(
+                'flex-1 py-2.5 px-4 rounded-lg font-medium text-sm transition-all duration-200',
+                !isSignUp 
+                  ? 'bg-gradient-primary text-primary-foreground' 
+                  : 'text-muted-foreground hover:text-foreground'
+              )}
+            >
+              Sign In
+            </button>
+            <button
+              onClick={() => toggleMode()}
+              className={cn(
+                'flex-1 py-2.5 px-4 rounded-lg font-medium text-sm transition-all duration-200',
+                isSignUp 
+                  ? 'bg-gradient-primary text-primary-foreground' 
+                  : 'text-muted-foreground hover:text-foreground'
+              )}
+            >
+              Sign Up
+            </button>
+          </div>
+
+          <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-4">
+              {isSignUp && (
+                <div className="animate-fade-in">
+                  <FitnessInput
+                    type="text"
+                    label="Full Name"
+                    placeholder="Enter your name"
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                    icon={<User className="w-5 h-5" />}
+                  />
+                </div>
+              )}
+              
               <FitnessInput
                 type="email"
                 label="Email"
@@ -97,15 +162,36 @@ const Login: React.FC = () => {
               <FitnessInput
                 type="password"
                 label="Password"
-                placeholder="Enter your password"
+                placeholder={isSignUp ? 'Create a password' : 'Enter your password'}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 icon={<Lock className="w-5 h-5" />}
               />
+
+              {isSignUp && (
+                <div className="animate-fade-in">
+                  <FitnessInput
+                    type="password"
+                    label="Confirm Password"
+                    placeholder="Confirm your password"
+                    value={confirmPassword}
+                    onChange={(e) => setConfirmPassword(e.target.value)}
+                    icon={<Lock className="w-5 h-5" />}
+                  />
+                </div>
+              )}
             </div>
 
+            {!isSignUp && (
+              <div className="flex justify-end">
+                <button type="button" className="text-sm text-primary hover:underline">
+                  Forgot password?
+                </button>
+              </div>
+            )}
+
             {error && (
-              <div className="p-3 rounded-lg bg-destructive/10 border border-destructive/30 text-destructive text-sm">
+              <div className="p-3 rounded-lg bg-destructive/10 border border-destructive/30 text-destructive text-sm animate-fade-in">
                 {error}
               </div>
             )}
@@ -117,7 +203,7 @@ const Login: React.FC = () => {
               isLoading={isLoading}
             >
               <Sparkles className="w-5 h-5" />
-              Sign In
+              {isSignUp ? 'Create Account' : 'Sign In'}
             </FitnessButton>
 
             <div className="relative my-6">
@@ -147,14 +233,16 @@ const Login: React.FC = () => {
               </FitnessButton>
             </div>
           </form>
-        </FitnessCard>
 
-        <p className="text-center text-muted-foreground text-sm mt-6">
-          Don't have an account?{' '}
-          <button className="text-primary hover:underline font-medium">
-            Start your fitness journey
-          </button>
-        </p>
+          {isSignUp && (
+            <p className="text-center text-muted-foreground text-xs mt-6 animate-fade-in">
+              By signing up, you agree to our{' '}
+              <button className="text-primary hover:underline">Terms of Service</button>
+              {' '}and{' '}
+              <button className="text-primary hover:underline">Privacy Policy</button>
+            </p>
+          )}
+        </FitnessCard>
       </div>
     </div>
   );
