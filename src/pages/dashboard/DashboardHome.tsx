@@ -12,7 +12,6 @@ const DashboardHome: React.FC = () => {
     workoutPlan, 
     dietPlan, 
     fitnessScore, 
-    totalCaloriesBurned,
     generateWorkoutPlan,
     generateDietPlan,
   } = useFitplanStore();
@@ -36,6 +35,7 @@ const DashboardHome: React.FC = () => {
 
   const totalDietCalories = dietPlan.reduce((acc, m) => acc + m.calories, 0);
   const consumedCalories = dietPlan.filter(m => m.completed).reduce((acc, m) => acc + m.calories, 0);
+  const burnedCalories = workoutPlan.filter(w => w.completed).reduce((acc, w) => acc + w.calories, 0);
 
   return (
     <div className="space-y-6 animate-fade-in">
@@ -45,14 +45,11 @@ const DashboardHome: React.FC = () => {
           Welcome to <span className="text-gradient-primary">fitplan.ai</span>
         </h1>
         <p className="text-muted-foreground mt-1">
-          Your AI-powered fitness journey starts here
+          Your AI-powered fitness analytics dashboard
         </p>
       </div>
 
-      {/* Interactive Controls */}
-      <MoodModeSelector />
-
-      {/* Stats Row */}
+      {/* Stats Row - Summary Metric Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <StatCard
           title="Today's Workout"
@@ -71,9 +68,9 @@ const DashboardHome: React.FC = () => {
           color="secondary"
         />
         <StatCard
-          title="Calories"
-          value={`${consumedCalories}`}
-          subtitle={`of ${totalDietCalories} kcal target`}
+          title="Calories Burned"
+          value={`${burnedCalories}`}
+          subtitle={`of ${workoutPlan.reduce((acc, w) => acc + w.calories, 0)} kcal target`}
           icon={<Flame className="w-6 h-6" />}
           trend={{ value: 12, isPositive: true }}
           color="primary"
@@ -88,14 +85,23 @@ const DashboardHome: React.FC = () => {
         />
       </div>
 
+      {/* Interactive Controls - Mood & Workout Mode */}
+      <MoodModeSelector />
+
       {/* Workout & Diet Panels */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <WorkoutPanel />
         <DietPanel />
       </div>
 
-      {/* Progress Charts */}
-      <ProgressCharts />
+      {/* Analytics Section - All Charts */}
+      <div>
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="text-xl font-bold">Analytics & Progress</h2>
+          <span className="text-sm text-muted-foreground">Last 7 days</span>
+        </div>
+        <ProgressCharts />
+      </div>
     </div>
   );
 };
