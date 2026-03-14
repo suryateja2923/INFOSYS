@@ -5,18 +5,39 @@ import { DietPanel } from '@/components/dashboard/DietPanel';
 import { Utensils, Flame, Beef, Droplet } from 'lucide-react';
 
 const DietPlanPage: React.FC = () => {
-  const { dietPlan, profile } = useFitplanStore();
+  const { dietPlans, currentDay, profile } = useFitplanStore();
   
-  const totalCalories = dietPlan.reduce((acc, m) => acc + m.calories, 0);
-  const totalProtein = dietPlan.reduce((acc, m) => acc + m.protein, 0);
-  const totalCarbs = dietPlan.reduce((acc, m) => acc + m.carbs, 0);
-  const totalFats = dietPlan.reduce((acc, m) => acc + m.fats, 0);
+  // Get the diet plan for the current day
+  const dietPlan = dietPlans[currentDay];
+  
+  // Helper function to parse numeric values (handles "35g" or 35)
+  const parseNumeric = (value: any): number => {
+    if (typeof value === 'number') return value;
+    if (typeof value === 'string') {
+      const parsed = parseFloat(value.replace(/[^\d.]/g, ''));
+      return isNaN(parsed) ? 0 : parsed;
+    }
+    return 0;
+  };
+  
+  // Calculate macros from the dynamic plan
+  const totalCalories = dietPlan?.meals?.reduce((acc, m) => acc + parseNumeric(m.calories), 0) || 0;
+  const totalProtein = dietPlan?.meals?.reduce((acc, m) => acc + parseNumeric(m.protein), 0) || 0;
+  const totalCarbs = dietPlan?.meals?.reduce((acc, m) => acc + parseNumeric(m.carbs), 0) || 0;
+  const totalFats = dietPlan?.meals?.reduce((acc, m) => acc + parseNumeric(m.fats), 0) || 0;
 
   const goalLabels: Record<string, string> = {
     weight_loss: 'Calorie Deficit Plan',
     weight_gain: 'Calorie Surplus Plan',
     muscle_growth: 'High Protein Plan',
     strength: 'Balanced Macros Plan',
+  };
+
+  const foodPreferenceLabels: Record<string, string> = {
+    'non-veg': 'Non-Vegetarian',
+    'veg': 'Vegetarian',
+    'pure-veg': 'Pure Vegan',
+    'mixed': 'Mixed (Veg + Non-Veg)',
   };
 
   return (
@@ -26,6 +47,20 @@ const DietPlanPage: React.FC = () => {
         <p className="text-muted-foreground mt-1">
           {profile?.goal ? goalLabels[profile.goal] : 'Your personalized nutrition plan'}
         </p>
+        
+        {/* Location & Food Preference Info */}
+        <div className="flex flex-wrap items-center gap-4 mt-3 text-sm">
+          {profile?.location && (
+            <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-primary/10 text-primary font-medium">
+              📍 {profile.location}
+            </span>
+          )}
+          {profile?.foodPreference && (
+            <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-success/10 text-success font-medium">
+              🥗 {foodPreferenceLabels[profile.foodPreference] || profile.foodPreference}
+            </span>
+          )}
+        </div>
       </div>
 
       {/* Macros Overview */}
@@ -37,22 +72,22 @@ const DietPlanPage: React.FC = () => {
         </FitnessCard>
         <FitnessCard className="text-center">
           <Beef className="w-8 h-8 mx-auto mb-2 text-destructive" />
-          <p className="text-2xl font-bold">{totalProtein}g</p>
+          <p className="text-2xl font-bold">{Math.round(totalProtein)}g</p>
           <p className="text-sm text-muted-foreground">Protein</p>
         </FitnessCard>
         <FitnessCard className="text-center">
           <Utensils className="w-8 h-8 mx-auto mb-2 text-warning" />
-          <p className="text-2xl font-bold">{totalCarbs}g</p>
+          <p className="text-2xl font-bold">{Math.round(totalCarbs)}g</p>
           <p className="text-sm text-muted-foreground">Carbs</p>
         </FitnessCard>
         <FitnessCard className="text-center">
           <Droplet className="w-8 h-8 mx-auto mb-2 text-secondary" />
-          <p className="text-2xl font-bold">{totalFats}g</p>
+          <p className="text-2xl font-bold">{Math.round(totalFats)}g</p>
           <p className="text-sm text-muted-foreground">Fats</p>
         </FitnessCard>
       </div>
 
-      <DietPanel />
+      <DietPanel variant="detailed" />
 
       {/* Tips */}
       <FitnessCard>

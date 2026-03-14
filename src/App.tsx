@@ -15,6 +15,7 @@ import NotFound from "./pages/NotFound";
 import DashboardLayout from "./layouts/DashboardLayout";
 import DashboardHome from "./pages/dashboard/DashboardHome";
 import WorkoutPlanPage from "./pages/dashboard/WorkoutPlanPage";
+import WorkoutVideosPage from "./pages/dashboard/WorkoutVideosPage";
 import DietPlanPage from "./pages/dashboard/DietPlanPage";
 import DayOneFeedback from "./pages/dashboard/DayOneFeedback";
 import ProgressPage from "./pages/dashboard/ProgressPage";
@@ -62,6 +63,7 @@ const App = () => (
           >
             <Route index element={<DashboardHome />} />
             <Route path="workout" element={<WorkoutPlanPage />} />
+            <Route path="videos" element={<WorkoutVideosPage />} />
             <Route path="diet" element={<DietPlanPage />} />
             <Route path="feedback" element={<DayOneFeedback />} />
             <Route path="progress" element={<ProgressPage />} />

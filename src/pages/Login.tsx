@@ -6,10 +6,10 @@ import { useFitplanStore } from '@/store/fitplanStore';
 import { useNavigate } from 'react-router-dom';
 import { Mail, Lock, Dumbbell, Sparkles, User } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { authAPI, profileAPI, loadUserPlanData } from '@/lib/api';
 
 const Login: React.FC = () => {
   const navigate = useNavigate();
-  const { setAuthenticated, isOnboarded } = useFitplanStore();
   const [isLoading, setIsLoading] = useState(false);
   const [isSignUp, setIsSignUp] = useState(false);
   const [email, setEmail] = useState('');
@@ -44,17 +44,50 @@ const Login: React.FC = () => {
 
     setIsLoading(true);
     
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 1500));
-    
-    setAuthenticated(true);
-    setIsLoading(false);
-    
-    // Redirect based on onboarding status
-    if (isOnboarded) {
-      navigate('/dashboard');
-    } else {
-      navigate('/onboarding');
+    try {
+      if (isSignUp) {
+        // Register new user
+        await authAPI.register(name, email, password);
+        
+        // After registration, auto-login
+        await authAPI.login(email, password);
+        
+        useFitplanStore.getState().setAuthenticated(true);
+        navigate('/onboarding'); // New users always go to onboarding
+      } else {
+        // Login existing user
+        await authAPI.login(email, password);
+        
+        useFitplanStore.getState().setAuthenticated(true);
+        
+        // Fetch user profile to check if onboarded + load their data
+        try {
+          const userProfile = await profileAPI.getProfile();
+          
+          if (userProfile?.profile) {
+            // User has completed onboarding
+            useFitplanStore.getState().setProfile(userProfile.profile);
+            useFitplanStore.getState().setOnboarded(true);
+            
+            // Load their existing plans
+            await loadUserPlanData();
+            
+            navigate('/dashboard');
+          } else {
+            // User exists but hasn't completed onboarding
+            navigate('/onboarding');
+          }
+        } catch (profileError) {
+          // If profile fetch fails, default to onboarding
+          console.error('Failed to fetch profile:', profileError);
+          navigate('/onboarding');
+        }
+      }
+    } catch (err) {
+      console.error('Authentication error:', err);
+      setError(err instanceof Error ? err.message : 'Authentication failed. Please try again.');
+    } finally {
+      setIsLoading(false);
     }
   };
 

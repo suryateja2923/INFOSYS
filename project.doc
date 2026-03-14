@@ -1,0 +1,833 @@
+FITPLAN.AI - PROJECT DOCUMENTATION
+AI-Powered Fitness & Diet Planning Platform
+February 2026
+
+================================================================================
+SECTION 1: PROBLEM STATEMENT
+================================================================================
+
+1.1 BACKGROUND
+In the modern era, fitness and diet planning are crucial but people struggle with:
+- Creating personalized fitness routines
+- Following customized meal plans  
+- Getting expert guidance without expensive personal trainers
+- Tracking progress effectively
+
+1.2 THE PROBLEM
+
+PERSONALIZATION ISSUES:
+• Generic workout plans that don't consider individual health conditions
+• Meal plans ignore location-based food availability
+• No consideration for food preferences (vegetarian/non-vegetarian)
+• One-size-fits-all approach that doesn't work for diverse users
+
+POOR USER ONBOARDING:
+• Complex, multi-page forms users don't complete
+• Unclear expectations about what data is needed
+• No guidance on fitness level or health conditions
+• Time-consuming setup process
+
+LACK OF AI INTEGRATION:
+• Static plans that don't adapt to user changes
+• No intelligent recommendations based on health data
+• Limited ability to generate varied meal plans
+• Manual plan creation with human limitations
+
+ACCESSIBILITY PROBLEMS:
+• Not mobile-friendly  
+• Difficult to navigate
+• No quick reference for daily plans
+• Poor data visualization
+
+IMPACT:
+Users waste time searching for generic fitness advice when they need:
+✓ Personalized workout routines
+✓ Region-specific meal plans
+✓ Health condition awareness
+✓ Easy-to-follow guidance
+✓ Quantifiable progress tracking
+
+
+================================================================================
+SECTION 2: SOLUTION OVERVIEW
+================================================================================
+
+2.1 FITPLAN.AI SOLUTION
+
+INTELLIGENT PERSONALIZATION:
+• Uses Google Gemini AI for plan generation
+• Considers location for regional cuisine
+• Respects food preferences (veg/non-veg)
+• Adapts to health conditions and fitness levels
+• Real-time BMI calculation with target weight
+
+STREAMLINED ONBOARDING (5-STEP):
+Step 1: Basic Information (Name, Email, Age, Gender)
+Step 2: Fitness Profile (Height, Weight, Level, Goal, BMI)
+Step 3: Health & Preferences (Location, Health Issues, Food Pref)
+Step 4: Confirmation (Review all details)
+Step 5: Generation (AI creates personalized plans)
+
+AI-POWERED PLAN GENERATION:
+• Workout Plans: Customized exercises based on fitness level and goal
+• Diet Plans: Location-aware, region-specific meals
+• Real-time adaptation: Change preferences → Regenerate plans
+• Specific quantities: Meals include exact ingredient amounts (not "1 plate")
+
+USER-FRIENDLY DASHBOARD:
+• Home View: Quick daily overview  
+• Detailed Views: Complete meal and workout plans
+• Progress Tracking: Visual charts and metrics
+• Settings: Easy profile management
+• Editable Food Preferences: Change anytime
+
+2.2 KEY ADVANTAGES
+
+PERSONALIZATION:
+- AI learns from user data
+- Location-aware meal suggestions (India/USA/Mediterranean specific dishes)
+- Health-condition-aware workouts
+- Food preference respect (vegetarian or mixed)
+
+EFFICIENCY:
+- Quick 5-step onboarding (5 minutes)
+- Instant plan generation (3-5 seconds)
+- No manual data entry after setup
+- Easy profile updates in settings
+
+ACCURACY:
+- Real-time BMI calculation
+- Specific meal quantities (Idli: 3 pieces, not "breakfast")
+- Macronutrient tracking
+- Evidence-based exercise recommendations
+
+USABILITY:
+- Simple, clean interface
+- Mobile-responsive design
+- Dark/light mode support
+- Intuitive navigation
+
+
+================================================================================
+SECTION 3: TECHNOLOGY STACK
+================================================================================
+
+3.1 FRONTEND TECHNOLOGY
+
+Framework:
+• React 18 - Modern UI framework with hooks
+• TypeScript - Type-safe development
+• Vite - Lightning-fast build tool
+
+Styling & UI:
+• Tailwind CSS - Utility-first CSS framework
+• Shadcn/UI - 40+ pre-built components
+• Lucide React - Beautiful icons
+• Responsive Design - Mobile-first approach
+
+State Management:
+• Zustand - Lightweight state management
+• localStorage - Client-side data persistence
+
+3.2 BACKEND TECHNOLOGY
+
+Framework:
+• FastAPI - High-performance Python web framework
+• Python 3.10+ - Latest Python features
+
+Database:
+• MongoDB - NoSQL document database
+• Collections: Users, Profiles, Plans
+• Indexes: Email, User ID for fast queries
+
+Authentication & Security:
+• JWT (JSON Web Tokens) - 24-hour expiration
+• bcrypt - Password hashing
+• CORS - Cross-origin resource sharing
+• Input Validation - Pydantic models
+
+AI Integration:
+• Google Gemini 2.5 Flash - Plan generation
+• Prompt Engineering - Location & preference-aware
+• Response Parsing - Structured JSON output
+
+3.3 ARCHITECTURE
+
+┌─────────────────────┐
+│   User Browser      │
+│  (React + TS)       │
+│  Zustand Store      │
+└──────────┬──────────┘
+           │ REST API
+           │ JWT Auth
+           ↓
+┌─────────────────────┐
+│   FastAPI Backend   │
+│  ├─ Auth            │
+│  ├─ Profiles        │
+│  ├─ AI Generation   │
+│  └─ Validation      │
+└──────────┬──────────┘
+           │
+    ┌──────┴──────┐
+    ↓             ↓
+┌────────┐   ┌──────────┐
+│MongoDB │   │ Gemini   │
+│Database│   │ API      │
+└────────┘   └──────────┘
+
+
+================================================================================
+SECTION 4: COMPLETE FEATURES & IMPLEMENTATION
+================================================================================
+
+4.1 FEATURE 1: USER AUTHENTICATION
+
+Registration Flow:
+User → Email/Password/Name → Validation → bcrypt Hash → MongoDB Store
+→ JWT Generated (24h) → Token to Frontend → localStorage
+
+Implementation:
+- POST /auth/register - Create user account
+- POST /auth/login - Authenticate user
+- POST /auth/refresh - Refresh expired token
+- Password hashed with bcrypt (10 salt rounds)
+- Tokens include user_id and expiration
+
+Security:
+- Never store plain passwords
+- JWT signature verified on backend
+- Token auto-refresh before expiration
+- Logout clears localStorage
+
+
+4.2 FEATURE 2: ONBOARDING (5-STEP PROCESS)
+
+STEP 1: BASIC INFORMATION
+Inputs: Name, Email, Age, Gender
+Validation: All required, age 15-120
+Output: Saved to form state
+
+STEP 2: FITNESS PROFILE  
+Inputs: Height (cm), Weight (kg), Fitness Level, Goal
+Real-time: BMI calculation
+Suggestion: Target weight for healthy BMI 22-24
+Validation: Ranges checked
+
+Formula: BMI = weight(kg) / (height(m))²
+Target: BMI 22 (healthy middle range)
+Display: Real-time color-coded feedback
+
+STEP 3: HEALTH & PREFERENCES
+Inputs:
+• Location (text) - Used for regional cuisine
+• Health Issues (multi-select) - Diabetes, BP, Heart, etc.
+• Food Preference (optional) - "Vegetarian Only" checkbox
+Default: If unchecked = 'mixed' (veg + non-veg)
+
+STEP 4: CONFIRMATION
+Display: All information in organized cards
+Actions: [Edit] buttons to go back | [Confirm] to proceed
+Validation: Content review only (no new input)
+
+STEP 5: GENERATION
+Processing:
+1. Show "Generating Plans..." spinner
+2. Call POST /ai/workout (with profile)
+3. Call POST /ai/diet (with profile + location + food pref)
+4. Gemini generates plans
+5. Parse and validate responses
+6. Save to MongoDB
+7. Cache in Zustand store
+8. Navigate to dashboard
+
+Success: Plans ready for viewing on dashboard
+
+
+4.3 FEATURE 3: AI WORKOUT PLAN GENERATION
+
+Input: User fitness level, goal, age, height, weight, health conditions
+
+Gemini Prompt Includes:
+- Fitness level (affects exercise difficulty)
+- Goal (affects exercise selection)
+- Health conditions (exercises to avoid)
+- Available time/days
+
+Output: 7-day workout plan with:
+- Exercise names
+- Sets and reps
+- Rest duration (seconds)
+- Difficulty level
+- Muscle groups targeted
+
+Example Output:
+Day 1: Full Body Strength (45 min)
+- Push-ups: 3 sets x 15 reps, 60s rest
+- Squats: 3 sets x 20 reps, 60s rest
+- Plank: 3 sets x 30 sec hold, 60s rest
+
+Storage: MongoDB workout_plans collection
+Display: WorkoutPlanPage component
+
+
+4.4 FEATURE 4: LOCATION-AWARE DIET PLANNING
+
+KEY INNOVATION: Regional cuisine awareness
+
+Location Examples:
+- India: Dal, Paneer, Rice, Roti, Sambar, Idli, Salad
+- USA: Chicken, Broccoli, Brown Rice, Fruits
+- Mediterranean: Olive Oil, Feta, Vegetables, Fish
+- East Asia: Rice, Tofu, Vegetables, Seafood
+
+Gemini Instruction:
+"Use local cuisine from [location]. Each meal must include:
+- Meal type and time
+- Dish name and description
+- Calories and macros (protein, carbs, fats)
+- Food type (veg/non-veg)
+- EXACT QUANTITIES (not approximations)
+  Example: Idli: 3 pieces, Sambar: 1 cup, Oil: 1 tsp"
+
+Output Example:
+Breakfast (8:00 AM): Idli with Sambar
+Calories: 250 | Protein: 12g | Veg
+Quantity:
+• Idli: 3 pieces
+• Sambar: 1 cup
+• Chutney: 2 tbsp
+
+Storage: MongoDB diet_plans collection
+Display: 
+- Dashboard (compact): Meal names only
+- DietPlanPage (detailed): Full info + green quantity section
+
+
+4.5 FEATURE 5: FOOD PREFERENCE MANAGEMENT
+
+Selection in Onboarding:
+Step 3: Single optional button "Vegetarian Only"
+- If unchecked: food_preference = 'mixed'
+- If checked: food_preference = 'veg'
+
+Implementation:
+State: formData.foodPreference
+Sent to backend: food_preference field
+Stored: user_profiles.food_preference
+
+Gemini Integration:
+"User food preference: Vegetarian Only" or "Mixed"
+Affects meal suggestions immediately
+
+Edit in Settings:
+Display (read-only): "Mixed (Veg + Non-Veg)" or "Vegetarian Only"
+Edit mode (dropdown):
+- Mixed (Veg + Non-Veg)
+- Vegetarian Only
+
+Save Flow:
+1. User selects new preference
+2. Click Save
+3. API: PUT /user/profile with food_preference
+4. Backend updates database
+5. Zustand store updates
+6. Optional: Ask to regenerate plans
+7. New plans will include only selected type
+
+
+4.6 FEATURE 6: REAL-TIME BMI CALCULATOR
+
+Formula:
+BMI = weight(kg) / (height(m))²
+
+Calculation:
+heightInMeters = height / 100
+bmi = weight / (heightInMeters * heightInMeters)
+
+Categories:
+< 18.5: Underweight ⚠️ (Yellow)
+18.5-24.9: Normal ✓ (Green)
+25-29.9: Overweight ⚠️ (Orange)
+≥ 30: Obese ❌ (Red)
+
+Target Weight:
+Aims for BMI 22 (healthy middle)
+targetWeight = 22 × (height in meters)²
+
+Display:
+"Your BMI: 26.2 (Overweight)"
+"Your target weight: ~71 kg"
+"Weight to lose: ~14 kg"
+
+Updates: Real-time as user types height/weight
+
+
+4.7 FEATURE 7: DASHBOARD HOME VIEW
+
+LAYOUT:
+┌─ Header: Welcome, [User Name]
+│
+├─ Progress Cards (4 columns):
+│  ├─ BMI: 26.2 (Overweight)
+│  ├─ Daily Calories: 2500 kcal
+│  ├─ Daily Protein: 150g
+│  └─ Water: 6 cups (Target: 8)
+│
+├─ Mood Selector:
+│  ├─ ⚡ High Energy
+│  ├─ 😌 Calm Focus
+│  ├─ 💪 Motivated
+│  └─ 😴 Light Movement
+│
+├─ Workout Panel:
+│  ├─ Today's Exercises
+│  └─ [Start Workout]
+│
+└─ Diet Panel (Compact):
+   ├─ Breakfast: Idli | 250 kcal | 12g | Veg
+   ├─ Lunch: Dal Rice | 450 kcal | 18g | Veg
+   ├─ Dinner: Paneer | 300 kcal | 20g | Veg
+   └─ [View Full Plan]
+
+Component: DashboardHome.tsx
+Data: From Zustand store (workoutPlans, dietPlans)
+Updates: Real-time from Zustand subscriptions
+
+
+4.8 FEATURE 8: DETAILED DIET PLAN PAGE
+
+LAYOUT:
+┌─ Header:
+│  ├─ Title: "Your 7-Day Diet Plan"
+│  └─ Badges:
+│     ├─ 📍 Location: Delhi
+│     └─ 🥬 Vegetarian Only (if applicable)
+│
+├─ Macro Cards (4):
+│  ├─ Total Calories: 2500 kcal
+│  ├─ Total Protein: 150g
+│  ├─ Total Carbs: 300g
+│  └─ Total Fats: 70g
+│
+├─ Meal Cards (scrollable):
+│  └─ For each day (Day 1-7):
+│     ┌────────────────────────┐
+│     │ BREAKFAST (8:00 AM)    │
+│     │ Idli with Sambar       │
+│     │ 250 kcal | 12g protein │
+│     │ 🥬 Vegetarian          │
+│     │                        │
+│     │ QUANTITY: (GREEN)      │
+│     │ • Idli: 3 pieces      │
+│     │ • Sambar: 1 cup       │
+│     │ • Chutney: 2 tbsp     │
+│     └────────────────────────┘
+│
+└─ Actions:
+   ├─ [Regenerate Plan]
+   ├─ [Share]
+   └─ [Favorite]
+
+Styling:
+Quantity section: bg-success/10 (light green)
+Border: border-success/30 (green)
+Text: text-success (green)
+
+
+4.9 FEATURE 9: SETTINGS & PROFILE MANAGEMENT
+
+READ-ONLY VIEW:
+Name: John Doe
+Age: 25
+Height: 180 cm
+Weight: 85 kg
+Fitness Level: Intermediate
+Goal: Lose Weight
+Location: Delhi
+Health Issues: High BP
+Food Preference: Mixed
+[Edit] Button
+
+EDIT VIEW:
+Name: [text input]
+Age: [number]
+Height: [number]
+Weight: [number]
+Fitness Level: [dropdown]
+Goal: [dropdown]
+Location: [text]
+Health Issues: [checkboxes]
+Food Preference: [dropdown]
+  • Mixed (Veg + Non-Veg)
+  • Vegetarian Only
+
+[Cancel] [Save]
+
+Save Flow:
+1. Make changes
+2. Click Save
+3. API: PUT /user/profile
+4. Backend validates & saves
+5. Toast: "Profile updated!"
+6. Ask: "Regenerate plans?"
+7. If yes: Clear old plans + call AI endpoints
+8. Exit edit mode
+
+
+4.10 FEATURE 10: PROGRESS TRACKING
+
+Tracks:
+• Weight change over time
+• Calorie balance (intake vs burnt)
+• BMI trend
+• Workout completion rate
+• Macro distribution
+
+Displays:
+• Line charts: Weight, BMI trends
+• Bar charts: Calorie tracking
+• Pie charts: Macro split
+• Progress rings: Workout completion
+
+Future:
+• Historical data analytics
+• Goal achievement predictions
+• Comparison (week/month/year)
+• Performance milestones
+
+
+================================================================================
+SECTION 5: COMPLETE SYSTEM WORKFLOW
+================================================================================
+
+5.1 USER REGISTRATION & LOGIN
+
+START
+│
+├─ User visits app
+│  ├─ Check if authenticated (JWT in localStorage)?
+│  │
+│  YES → Dashboard
+│  NO → Login/Register
+│
+├─ Registration Page:
+│  • Email input
+│  • Password input  
+│  • Name input
+│  • [Sign Up]
+│
+├─ Frontend validation
+│  └─ Email format, password strength, name length
+│
+├─ POST /auth/register (Backend)
+│  ├─ Check if email exists
+│  ├─ Hash password (bcrypt)
+│  ├─ Create user in MongoDB
+│  ├─ Generate JWT (24h)
+│  └─ Return token
+│
+├─ Frontend receives token
+│  ├─ Store in localStorage
+│  ├─ Update Zustand
+│  └─ Redirect to Onboarding
+│
+└─ ONBOARDING
+
+
+5.2 ONBOARDING WORKFLOW
+
+STEP 1 → STEP 2 → STEP 3 → STEP 4 → STEP 5 → DASHBOARD
+
+Step 1: Basic Info
+Form: Name, Email, Age, Gender
+Next: Go to Step 2
+
+Step 2: Fitness Profile
+Form: Height, Weight, Level, Goal
+Calculate: BMI real-time
+Target: Suggest target weight
+Next: Go to Step 3
+
+Step 3: Health & Preferences
+Form: Location, Health Issues, Food Preference
+Back: To Step 2
+Next: To Step 4
+
+Step 4: Confirmation
+Display: All information
+Edit: Click to go back to step
+Confirm: Proceed to Step 5
+
+Step 5: Generation (AI Plans)
+Loading: Show spinner
+Calls:
+  - POST /ai/workout
+  - POST /ai/diet
+Success: Cache in store
+Navigate: To Dashboard
+
+
+5.3 PLAN GENERATION WORKFLOW
+
+User Profile + Data
+    ↓
+Format Gemini Prompt
+├─ User profile info
+├─ Location (for meals)
+├─ Food preference (veg/mixed)
+├─ Health conditions
+└─ Goal
+    ↓
+Call Gemini API
+├─ genai.GenerativeModel("gemini-2.5-flash")
+├─ Send prompt
+└─ Receive response
+    ↓
+Parse Response
+├─ Validate JSON
+├─ Extract exercises/meals
+└─ Check quantities
+    ↓
+Store in MongoDB
+├─ Save workout_plans
+└─ Save diet_plans
+    ↓
+Cache in Frontend
+├─ Zustand store
+└─ localStorage
+    ↓
+Display on Dashboard
+
+
+5.4 FOOD PREFERENCE CHANGE WORKFLOW
+
+Current: 'mixed'
+User Action: Change to 'veg' in Settings
+
+Onboarding: Drop down
+- Mixed (Veg + Non-Veg)  
+- Vegetarian Only
+
+Select "Vegetarian Only"
+    ↓
+Click Save
+    ↓
+API: PUT /user/profile
+{
+  food_preference: 'veg',
+  ...other fields
+}
+    ↓
+Backend: Update database
+    ↓
+Frontend: Update Zustand
+    ↓
+Ask: "Regenerate plans?"
+    ├─ YES:
+    │  ├─ Clear old diet plans
+    │  ├─ Call POST /ai/diet
+    │  ├─ New plans (all vegetarian)
+    │  └─ Display on page
+    │
+    └─ NO:
+       └─ Keep existing plans
+
+
+5.5 ERROR HANDLING
+
+API Error
+    ↓
+Check Status:
+├─ 401 Unauthorized:
+│  ├─ Try refresh token
+│  └─ If fails: redirect to login
+│
+├─ 400 Bad Request:
+│  └─ Show validation message
+│
+├─ 500 Server Error:
+│  └─ Show "Please try again later"
+│
+└─ Network Error:
+   └─ Show "Check internet"
+    ↓
+Display Toast Notification
+    ↓
+User can retry
+
+
+================================================================================
+SECTION 6: DATABASE SCHEMA
+================================================================================
+
+USERS Collection:
+{
+  _id: ObjectId,
+  email: String (unique),
+  password_hash: String,
+  name: String,
+  created_at: DateTime,
+  updated_at: DateTime
+}
+
+USER_PROFILES Collection:
+{
+  _id: ObjectId,
+  user_id: ObjectId (foreign key, indexed),
+  age: Number,
+  gender: String,
+  height: Number (cm),
+  weight: Number (kg),
+  fitness_level: String,
+  goal: String,
+  location: String,
+  health_issues: Array,
+  food_preference: String ('veg' or 'mixed'),
+  updated_at: DateTime
+}
+
+WORKOUT_PLANS Collection:
+{
+  _id: ObjectId,
+  user_id: ObjectId (indexed),
+  days: Number,
+  exercises: Array [
+    {
+      day: Number,
+      name: String,
+      exercises: Array
+    }
+  ],
+  created_at: DateTime
+}
+
+DIET_PLANS Collection:
+{
+  _id: ObjectId,
+  user_id: ObjectId (indexed),
+  days: Number,
+  meals: Array [...],
+  location: String,
+  food_preference: String,
+  total_calories: Number,
+  total_protein: Number,
+  created_at: DateTime
+}
+
+Indexes:
+- users.email (unique)
+- user_profiles.user_id
+- workout_plans.user_id
+- diet_plans.user_id
+
+
+================================================================================
+SECTION 7: API ENDPOINTS SUMMARY
+================================================================================
+
+AUTHENTICATION:
+POST /auth/register - Register user
+POST /auth/login - Login user
+POST /auth/refresh - Refresh token
+
+USER PROFILE:
+GET /user/profile - Get profile
+PUT /user/profile - Update profile
+
+AI PLANS:
+POST /ai/workout - Generate workout
+POST /ai/diet - Generate diet
+
+PLANS MANAGEMENT:
+GET /user/plans - Get all plans
+GET /user/plans/workout/:id - Get workout
+GET /user/plans/diet/:id - Get diet
+POST /user/plans/clear - Clear all plans
+
+
+================================================================================
+SECTION 8: DEPLOYMENT & PRODUCTION
+================================================================================
+
+FRONTEND DEPLOYMENT:
+Build: bun run build
+Deploy to: Vercel, Netlify, or AWS S3
+Environment: VITE_API_URL set to production backend
+
+BACKEND DEPLOYMENT:
+Provider: Railway, Render, or AWS Lambda
+Database: MongoDB Atlas (cloud)
+Environment: Set production .env variables
+
+DATABASE:
+Use: MongoDB Atlas (cloud)
+Backup: Automated daily backups
+Security: Authentication enabled
+
+CI/CD:
+Pipeline: GitHub Actions (future)
+Testing: Automated before deploy
+Monitoring: Sentry for errors
+
+
+================================================================================
+SECTION 9: SECURITY MEASURES
+================================================================================
+
+FRONTEND:
+✓ Input validation before API calls
+✓ XSS prevention (React escapes content)
+✓ HTTPS only (production)
+✓ Secure token storage (localStorage)
+
+BACKEND:
+✓ Password hashing (bcrypt, 10 rounds)
+✓ JWT validation on protected endpoints
+✓ Pydantic input validation
+✓ Parameterized MongoDB queries
+✓ Rate limiting (future)
+
+DATABASE:
+✓ Authentication enabled
+✓ User data isolation (by user_id)
+✓ Regular backups
+✓ Encryption at rest
+
+
+================================================================================
+SECTION 10: CONCLUSION
+================================================================================
+
+FITPLAN.AI SOLVES:
+✓ Personalization: AI-powered plans
+✓ Location Awareness: Regional cuisine
+✓ Food Preferences: Veg or mixed
+✓ Accessibility: Mobile-friendly
+✓ Accuracy: Specific quantities
+✓ Ease of Use: Simple 5-step onboarding
+
+PRODUCTION READY:
+✓ Complete authentication
+✓ 5-step onboarding
+✓ AI plan generation
+✓ Real-time BMI calculator
+✓ Dashboard with multiple views
+✓ Settings & profile management
+✓ Complete API documentation
+✓ Scalable architecture
+
+NEXT STEPS:
+1. Deploy to production
+2. Gather user feedback
+3. Implement analytics
+4. Plan Phase 2 features
+5. Scale infrastructure
+
+FUTURE ROADMAP:
+Phase 2: Recipes, shopping lists, activity logging
+Phase 3: Mobile app, wearable integration, community
+Phase 4: Subscriptions, advanced analytics, social features
+
+This completes the Fitplan.ai project documentation.
+Thank you for reviewing the complete solution.

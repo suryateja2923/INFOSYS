@@ -5,6 +5,7 @@ import { useFitplanStore } from '@/store/fitplanStore';
 import {
   Home,
   Dumbbell,
+  Video,
   Utensils,
   MessageSquare,
   BarChart3,
@@ -24,6 +25,7 @@ interface DashboardSidebarProps {
 const navItems = [
   { path: '/dashboard', label: 'Home', icon: Home },
   { path: '/dashboard/workout', label: 'Workout Plan', icon: Dumbbell },
+  { path: '/dashboard/videos', label: 'Workout Videos', icon: Video },
   { path: '/dashboard/diet', label: 'Diet Plan', icon: Utensils },
   { path: '/dashboard/feedback', label: 'Day One Feedback', icon: MessageSquare },
   { path: '/dashboard/progress', label: 'Progress Graphs', icon: BarChart3 },

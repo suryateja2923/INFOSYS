@@ -1,0 +1,230 @@
+AGENTX CHATBOT INTEGRATION - FITPLAN.AI DASHBOARD
+==================================================
+
+INTEGRATION OVERVIEW:
+The AgentX chatbot will display as a floating chat bubble
+ONLY when users are viewing the Dashboard
+It will NOT appear on Login, Onboarding, or other pages
+
+
+IMPLEMENTATION METHOD 1 (Recommended): Add to DashboardLayout.tsx
+=====================================================================
+
+File: src/layouts/DashboardLayout.tsx
+
+Add this code after imports, inside the component:
+
+---START OF CODE TO ADD---
+
+import { useEffect } from 'react';
+
+export default function DashboardLayout({ children }: { children: React.ReactNode }) {
+  useEffect(() => {
+    // Initialize AgentX chatbot - Dashboard only
+    const initAgentX = () => {
+      // Create chat bubble container
+      const chatBubbleRoot = document.getElementById('chatBubbleRoot');
+      if (!chatBubbleRoot) {
+        const root = document.body.appendChild(document.createElement('div'));
+        root.setAttribute('id', 'chatBubbleRoot');
+      }
+
+      // Set AgentX credentials
+      window.agx = '698a2150adfb07e4322f8b14DB3zn76SnuxyDvRzIQIdUA==|SXumI/A4zPRadJpcBuLNPrPQ9nR9nHNmlJp5z+xR3Ts=';
+
+      // Load AgentX script
+      const script = document.createElement('script');
+      script.src = 'https://storage.googleapis.com/agentx-cdn-01/agentx-chat.js';
+      script.defer = true;
+      document.body.appendChild(script);
+    };
+
+    initAgentX();
+
+    // Cleanup: Remove AgentX when leaving dashboard
+    return () => {
+      const chatBubbleRoot = document.getElementById('chatBubbleRoot');
+      if (chatBubbleRoot) {
+        chatBubbleRoot.remove();
+      }
+      // Remove AgentX script
+      const scripts = document.querySelectorAll('script[src="https://storage.googleapis.com/agentx-cdn-01/agentx-chat.js"]');
+      scripts.forEach(script => script.remove());
+    };
+  }, []);
+
+  return (
+    <div className="flex h-screen bg-background">
+      {/* Your existing layout code */}
+      {children}
+    </div>
+  );
+}
+
+---END OF CODE TO ADD---
+
+
+IMPLEMENTATION METHOD 2: Add to main.tsx
+=========================================
+
+File: src/main.tsx
+
+Insert this code after your router setup:
+
+---START OF CODE TO ADD---
+
+// AgentX Chatbot - Dashboard only
+import { useEffect } from 'react';
+
+function AgentXLoader() {
+  useEffect(() => {
+    const currentPath = window.location.pathname;
+    const isDashboard = currentPath.includes('/dashboard');
+
+    if (isDashboard) {
+      // Create chat bubble root
+      let chatBubbleRoot = document.getElementById('chatBubbleRoot');
+      if (!chatBubbleRoot) {
+        chatBubbleRoot = document.createElement('div');
+        chatBubbleRoot.setAttribute('id', 'chatBubbleRoot');
+        document.body.appendChild(chatBubbleRoot);
+      }
+
+      // Initialize AgentX
+      window.agx = '698a2150adfb07e4322f8b14DB3zn76SnuxyDvRzIQIdUA==|SXumI/A4zPRadJpcBuLNPrPQ9nR9nHNmlJp5z+xR3Ts=';
+
+      // Load script if not already loaded
+      if (!document.querySelector('script[src="https://storage.googleapis.com/agentx-cdn-01/agentx-chat.js"]')) {
+        const script = document.createElement('script');
+        script.src = 'https://storage.googleapis.com/agentx-cdn-01/agentx-chat.js';
+        script.defer = true;
+        document.body.appendChild(script);
+      }
+    }
+  }, []);
+
+  return null;
+}
+
+---END OF CODE TO ADD---
+
+
+STEP-BY-STEP SETUP INSTRUCTIONS
+=================================
+
+STEP 1: Choose Implementation Method
+☐ Method 1: Add to DashboardLayout.tsx (if you have a dashboard wrapper)
+☐ Method 2: Add to main.tsx (if using single router setup)
+
+STEP 2: Open the chosen file
+- Navigate to src/layouts/DashboardLayout.tsx or src/main.tsx
+
+STEP 3: Copy the code from above
+- Copy the entire code block for your chosen method
+
+STEP 4: Paste into the file
+- Add it to the appropriate location
+- For DashboardLayout: Add inside the component
+- For main.tsx: Add near the bottom after other components
+
+STEP 5: Save the file
+- Ctrl+S to save
+
+STEP 6: Verify imports
+- Make sure 'useEffect' from 'react' is imported:
+  import { useEffect } from 'react';
+
+STEP 7: Test the integration
+- Start your development server: bun run dev
+- Navigate to Dashboard - Chat bubble should appear ✓
+- Navigate to Login - Chat bubble should NOT appear ✓
+- Navigate to Onboarding - Chat bubble should NOT appear ✓
+
+EXPECTED BEHAVIOR
+=================
+
+✓ Dashboard Home: Chat bubble visible in bottom-right corner
+✓ Diet Plan Page: Chat bubble visible
+✓ Workout Plan Page: Chat bubble visible
+✓ Progress Page: Chat bubble visible
+✓ Settings Page: Chat bubble visible
+✓ Login Page: Chat bubble NOT visible
+✓ Onboarding Page: Chat bubble NOT visible
+✓ 404 Page: Chat bubble NOT visible
+
+
+AGENTX CREDENTIALS
+==================
+
+ID: 698a2150adfb07e4322f8b14DB3zn76SnuxyDvRzIQIdUA==
+Key: SXumI/A4zPRadJpcBuLNPrPQ9nR9nHNmlJp5z+xR3Ts=
+Script URL: https://storage.googleapis.com/agentx-cdn-01/agentx-chat.js
+
+These credentials are already embedded in the code above.
+
+
+TROUBLESHOOTING
+===============
+
+Issue: Chat bubble appears on all pages
+Solution: 
+- Use Method 1 (DashboardLayout) for dashboard-only display
+- Ensure the cleanup function is running correctly
+- Clear browser cache (Ctrl+Shift+Del)
+
+Issue: Chat bubble not appearing on dashboard
+Solution:
+- Check if AgentX script loaded (Console → Network tab)
+- Verify credentials are correct
+- Check browser console for errors (F12)
+- Make sure JavaScript is enabled
+
+Issue: Chat bubble appears multiple times
+Solution:
+- Check cleanup function is removing duplicate instances
+- Clear localStorage and cache
+- Restart development server
+
+Issue: Chat bubble blocks content
+Solution:
+- Add CSS to main.css to reposition:
+  #chatBubbleRoot {
+    z-index: 999;
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+  }
+
+
+QUICK REFERENCE
+===============
+
+AgentX Chat Bot Features:
+✓ Fitness guidance
+✓ Food recipes
+✓ Workout assistance
+✓ Cooking help
+✗ Blocks non-fitness/non-recipe requests
+✗ No medical advice
+✗ No financial advice
+
+Instructions to follow: See AGENTX_BOT_INSTRUCTIONS.txt
+
+
+AFTER INTEGRATION CHECKLIST
+============================
+
+☐ Code added to chosen file
+☐ File saved successfully
+☐ No TypeScript errors in IDE
+☐ Development server started (bun run dev)
+☐ Chat bubble appears on dashboard ✓
+☐ Chat bubble doesn't appear on login ✓
+☐ Chat bubble doesn't appear on onboarding ✓
+☐ Can send fitness questions to bot ✓
+☐ Can send recipe questions to bot ✓
+☐ Bot blocks non-fitness/recipe requests ✓
+☐ Integration complete!
+
+
+END OF INTEGRATION GUIDE

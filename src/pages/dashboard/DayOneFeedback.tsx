@@ -6,11 +6,13 @@ import { useFitplanStore } from '@/store/fitplanStore';
 import { Slider } from '@/components/ui/slider';
 import { Star, MessageSquare, Dumbbell, Utensils, Send, Check } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { completeDayAndGenerateNext, workoutAPI, dietAPI } from '@/lib/api';
 
 const DayOneFeedback: React.FC = () => {
   const navigate = useNavigate();
-  const { dayOneFeedback, setDayFeedback } = useFitplanStore();
+  const { dayOneFeedback, setDayFeedback, currentDay, workoutMode, unlockNextDay } = useFitplanStore();
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [error, setError] = useState('');
   
   const [feedback, setFeedback] = useState({
     workoutRating: dayOneFeedback?.workoutRating ?? 4,
@@ -25,10 +27,77 @@ const DayOneFeedback: React.FC = () => {
 
   const handleSubmit = async () => {
     setIsSubmitting(true);
-    await new Promise(resolve => setTimeout(resolve, 1500));
-    setDayFeedback({ ...feedback, submitted: true });
-    setIsSubmitting(false);
-    navigate('/dashboard');
+    setError('');
+    
+    try {
+      // Convert ratings to numeric scale
+      const moodMap: { [key: string]: string } = {
+        '1': 'exhausted',
+        '2': 'stressed',
+        '3': 'energetic',
+        '4': 'energetic',
+        '5': 'energetic',
+      };
+      
+      const mood = moodMap[feedback.workoutRating.toString()] || 'energetic';
+      
+      // Submit feedback and generate Day 2
+      const result = await completeDayAndGenerateNext(
+        currentDay,
+        {
+          mood: mood,
+          energy: Math.round(feedback.workoutEnergy / 10), // Convert 0-100 to 0-10
+          difficulty: Math.round(feedback.workoutDifficulty / 10), // Convert 0-100 to 0-10
+          comment: `Workout: ${feedback.workoutComments}. Diet: ${feedback.dietComments}`,
+        },
+        workoutMode
+      );
+      
+      // Save feedback locally
+      setDayFeedback({ ...feedback, submitted: true });
+      
+      // Store Day 2 plans in dynamic store structure
+      if (result.workout) {
+        useFitplanStore.getState().setWorkoutPlan(currentDay + 1, result.workout);
+        
+        // 💾 Save Day 2 workout to database
+        try {
+          await workoutAPI.saveWorkout({
+            day: currentDay + 1,
+            place: result.workout.place || workoutMode,
+            difficulty: result.workout.difficulty || 'beginner',
+            exercises: result.workout.exercises || [],
+          });
+        } catch (saveErr) {
+          console.log('Day 2 Workout saved to store but not database:', saveErr);
+        }
+      }
+      
+      if (result.diet) {
+        useFitplanStore.getState().setDietPlan(currentDay + 1, result.diet);
+        
+        // 💾 Save Day 2 diet to database
+        try {
+          await dietAPI.saveDiet({
+            day: currentDay + 1,
+            calories: result.diet.total_calories || 2000,
+            meals: result.diet.meals || [],
+          });
+        } catch (saveErr) {
+          console.log('Day 2 Diet saved to store but not database:', saveErr);
+        }
+      }
+      
+      // Unlock Day 2
+      unlockNextDay();
+      
+      navigate('/dashboard');
+    } catch (err) {
+      console.error('Failed to submit feedback:', err);
+      setError(err instanceof Error ? err.message : 'Failed to submit feedback. Please try again.');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   if (dayOneFeedback?.submitted) {
